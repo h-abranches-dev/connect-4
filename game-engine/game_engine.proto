@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package gameengine;
+
+option go_package = ".;gameengine";
+
+service Route {
+  rpc Ping (PingPayload) returns (PingResponse) {}
+}
+
+message PingPayload {}
+
+message PingResponse {
+  string pong = 1;
+}

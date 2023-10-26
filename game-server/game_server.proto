@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package gameserver;
+
+option go_package = ".;gameserver";
+
+service Route {
+  rpc Ping (PingPayload) returns (PingResponse) {}
+}
+
+message PingPayload {}
+
+message PingResponse {
+  string pong = 1;
+}
