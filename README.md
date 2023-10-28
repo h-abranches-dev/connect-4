@@ -16,11 +16,11 @@ $ ./bin/ge --port=50051
 How to run the game server:
 ```sh
 $ make -s build SYSTEM=gs
-$ ./bin/gs --port=50052
+$ ./bin/gs --port=50052 --geHost=127.0.0.1 --gePort=50051
 ```
 
 How to run the game client:
 ```sh
 $ make -s build SYSTEM=gc
-$ ./bin/gc
+$ ./bin/gc --gsHost=127.0.0.1 --gsPort=50052
 ```

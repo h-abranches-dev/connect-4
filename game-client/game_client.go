@@ -30,7 +30,7 @@ func SetVersion(v *versions.Version, nv versions.Version) {
 func OpenNewConn(gsAddr string) (*grpc.ClientConn, gameserver.RouteClient) {
 	conn, err := grpc.Dial(gsAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		fmt.Printf("it wasn't possible creating a client connection with the game server in %s\n", gsAddr)
+		fmt.Printf("it wasn't possible to create a connection with the game server in %s\n", gsAddr)
 	}
 
 	return conn, gameserver.NewRouteClient(conn)

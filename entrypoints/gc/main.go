@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/h-abranches-dev/connect-4/game-client"
 	gameserver "github.com/h-abranches-dev/connect-4/game-server"
@@ -11,30 +12,27 @@ import (
 	"strings"
 )
 
+const (
+	gsDefaultHost = "127.0.0.1"
+	gsDefaultPort = 50052
+)
+
+var (
+	gsHost = flag.String("gsHost", gsDefaultHost, "the game server host")
+	gsPort = flag.Int("gsPort", gsDefaultPort, "the game server port")
+	gsAddr string
+)
+
 func main() {
+	flag.Parse()
+
+	setGSAddr()
 	setVersion(ldflags.Version())
 
-	conn, rc := gameclient.OpenNewConn(utils.NewAddress("127.0.0.1", 50052))
+	conn, rc := gameclient.OpenNewConn(gsAddr)
 	defer utils.CloseConn(conn)
 
 	start(rc)
-}
-
-func setVersion(v string) {
-	pv, err := versions.Set(v)
-	if err != nil {
-		panic(err)
-	}
-	gameclient.SetVersion(gameclient.GetVersion(), *pv)
-}
-
-func displayVersion() {
-	v := colors.FgRed(string(*gameclient.GetVersion()))
-	fmt.Printf("version: %s\n\n", v)
-}
-
-func clearConsole() {
-	fmt.Printf("\033[2J")
 }
 
 func initialize() {
@@ -42,6 +40,7 @@ func initialize() {
 	fmt.Printf("\n%s\n\n", gameTitle)
 
 	displayVersion()
+	displayGSAddr()
 }
 
 func start(rc gameserver.RouteClient) {
@@ -68,4 +67,29 @@ func start(rc gameserver.RouteClient) {
 	}
 
 	fmt.Println()
+}
+
+func clearConsole() {
+	fmt.Printf("\033[2J")
+}
+
+func setVersion(v string) {
+	pv, err := versions.Set(v)
+	if err != nil {
+		panic(err)
+	}
+	gameclient.SetVersion(gameclient.GetVersion(), *pv)
+}
+
+func displayVersion() {
+	v := colors.FgRed(string(*gameclient.GetVersion()))
+	fmt.Printf("version: %s\n\n", v)
+}
+
+func setGSAddr() {
+	gsAddr = utils.NewAddress(*gsHost, *gsPort)
+}
+
+func displayGSAddr() {
+	fmt.Printf("game server address: %s\n\n", gsAddr)
 }

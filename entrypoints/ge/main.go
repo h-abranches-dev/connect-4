@@ -35,7 +35,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	gameengine.RegisterRouteServer(grpcServer, gameengine.NewGameEngineWrapper())
+	gameengine.RegisterRouteServer(grpcServer, gameengine.NewGameEngine())
 
 	fmt.Printf("game engine is listening on the address %s\n", colors.FgRed(lis.Addr().String()))
 

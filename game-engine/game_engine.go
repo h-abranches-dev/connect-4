@@ -5,7 +5,7 @@ import (
 	"github.com/h-abranches-dev/connect-4/pkg/versions"
 )
 
-type GEWrapper struct {
+type GameEngine struct {
 	UnimplementedRouteServer
 }
 
@@ -13,11 +13,11 @@ var (
 	version = new(versions.Version)
 )
 
-func NewGameEngineWrapper() *GEWrapper {
-	return &GEWrapper{}
+func NewGameEngine() *GameEngine {
+	return &GameEngine{}
 }
 
-func (gew *GEWrapper) Ping(ctx context.Context, payload *PingPayload) (*PingResponse, error) {
+func (ge *GameEngine) Ping(ctx context.Context, payload *PingPayload) (*PingResponse, error) {
 	return &PingResponse{Pong: "pong"}, nil
 }
 

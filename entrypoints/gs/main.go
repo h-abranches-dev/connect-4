@@ -13,21 +13,28 @@ import (
 )
 
 const (
-	defaultPort = 50052
+	defaultPort   = 50052
+	geDefaultHost = "127.0.0.1"
+	geDefaultPort = 50051
 )
 
 var (
-	port = flag.Int("port", defaultPort, "the game server port")
+	port   = flag.Int("port", defaultPort, "the game server port")
+	geHost = flag.String("geHost", geDefaultHost, "the game engine host")
+	gePort = flag.Int("gePort", geDefaultPort, "the game engine port")
+	geAddr string
 )
 
 func main() {
+	flag.Parse()
+
+	setGEAddr()
 	setVersion(ldflags.Version())
 
 	displayVersion()
+	displayGEAddr()
 
-	flag.Parse()
-
-	conn, rc := gameserver.OpenNewConn(utils.NewAddress("127.0.0.1", 50051))
+	conn, rc := gameserver.OpenNewConn(geAddr)
 	defer utils.CloseConn(conn)
 
 	err := gameserver.PingGameEngine(rc)
@@ -44,7 +51,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	gameserver.RegisterRouteServer(grpcServer, gameserver.NewGameServerWrapper())
+	gameserver.RegisterRouteServer(grpcServer, gameserver.NewGameServer())
 
 	fmt.Printf("game server is listening on the address %s\n", colors.FgRed(lis.Addr().String()))
 
@@ -67,4 +74,12 @@ func displayVersion() {
 	v := colors.FgRed(string(*gameserver.GetVersion()))
 	fmt.Printf("%s game server\n\n", gameTitle)
 	fmt.Printf("version: %s\n\n", v)
+}
+
+func setGEAddr() {
+	geAddr = utils.NewAddress(*geHost, *gePort)
+}
+
+func displayGEAddr() {
+	fmt.Printf("game engine address: %s\n\n", geAddr)
 }
