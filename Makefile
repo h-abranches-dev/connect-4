@@ -18,8 +18,12 @@ endif
 
 LDFLAGS = "-X 'github.com/version-go/ldflags.buildVersion=$(BUILD_VERSION)'"
 
-build:
+build: tests
 	go build -ldflags $(LDFLAGS) -o bin/$(SYSTEM) ./entrypoints/$(SYSTEM)
+
+tests:
+	# run tests in current directory and all of its subdirectories
+	go test -v ./...
 
 run_gc:
 	./bin/gc

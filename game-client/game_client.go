@@ -15,15 +15,15 @@ const (
 )
 
 var (
-	gameClientVersion = new(versions.Version)
+	version = new(versions.Version)
 )
 
-func GetVersion() *versions.Version {
-	return gameClientVersion
+func GetVersion() string {
+	return version.Tag
 }
 
-func SetVersion(v *versions.Version, nv versions.Version) {
-	*v = nv
+func SetVersion(nv versions.Version) {
+	*version = nv
 }
 
 // OpenNewConn set up a connection to the game server creating a route client

@@ -22,7 +22,6 @@ var (
 
 func main() {
 	setVersion(ldflags.Version())
-
 	displayVersion()
 
 	flag.Parse()
@@ -46,16 +45,16 @@ func main() {
 }
 
 func setVersion(v string) {
-	pv, err := versions.Set(v)
+	pv, err := versions.GetVersion(versions.Get(), v)
 	if err != nil {
 		panic(err)
 	}
-	gameengine.SetVersion(gameengine.GetVersion(), *pv)
+	gameengine.SetVersion(*pv)
 }
 
 func displayVersion() {
 	gameTitle := colors.FgRed("CONNECT-4")
-	v := colors.FgRed(string(*gameengine.GetVersion()))
+	v := colors.FgRed(gameengine.GetVersion())
 	fmt.Printf("%s game engine\n\n", gameTitle)
 	fmt.Printf("version: %s\n\n", v)
 }

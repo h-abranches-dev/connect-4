@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
+	"regexp"
+	"strings"
 )
 
 func ListSrvAddr(port int) string {
@@ -19,4 +22,24 @@ func CloseConn(conn *grpc.ClientConn) {
 	if err != nil {
 		log.Fatalf("error closing the connection (%s)", conn.Target())
 	}
+}
+
+func FormatErrors(errs []string) error {
+	if errs == nil || len(errs) == 0 {
+		return errors.New("{  }")
+	}
+	return fmt.Errorf("{\n\t%s\n}", strings.Join(errs, "\n\t"))
+}
+
+func FormatSliceStrings(slc []string) string {
+	return fmt.Sprintf("[ %s ]", strings.Join(slc, ", "))
+}
+
+func MatchRegex(regex, s string) bool {
+	r, err := regexp.Compile(regex)
+	if err != nil {
+		return false
+	}
+	matched := r.MatchString(s)
+	return matched
 }

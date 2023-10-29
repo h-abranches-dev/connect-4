@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Route_Ping_FullMethodName = "/gameengine.Route/Ping"
+	Route_Ping_FullMethodName                = "/gameengine.Route/Ping"
+	Route_VerifyCompatibility_FullMethodName = "/gameengine.Route/VerifyCompatibility"
 )
 
 // RouteClient is the client API for Route service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RouteClient interface {
 	Ping(ctx context.Context, in *PingPayload, opts ...grpc.CallOption) (*PingResponse, error)
+	VerifyCompatibility(ctx context.Context, in *VerifyCompatibilityPayload, opts ...grpc.CallOption) (*VerifyCompatibilityResponse, error)
 }
 
 type routeClient struct {
@@ -46,11 +48,21 @@ func (c *routeClient) Ping(ctx context.Context, in *PingPayload, opts ...grpc.Ca
 	return out, nil
 }
 
+func (c *routeClient) VerifyCompatibility(ctx context.Context, in *VerifyCompatibilityPayload, opts ...grpc.CallOption) (*VerifyCompatibilityResponse, error) {
+	out := new(VerifyCompatibilityResponse)
+	err := c.cc.Invoke(ctx, Route_VerifyCompatibility_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RouteServer is the server API for Route service.
 // All implementations must embed UnimplementedRouteServer
 // for forward compatibility
 type RouteServer interface {
 	Ping(context.Context, *PingPayload) (*PingResponse, error)
+	VerifyCompatibility(context.Context, *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error)
 	mustEmbedUnimplementedRouteServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedRouteServer struct {
 
 func (UnimplementedRouteServer) Ping(context.Context, *PingPayload) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedRouteServer) VerifyCompatibility(context.Context, *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyCompatibility not implemented")
 }
 func (UnimplementedRouteServer) mustEmbedUnimplementedRouteServer() {}
 
@@ -92,6 +107,24 @@ func _Route_Ping_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Route_VerifyCompatibility_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyCompatibilityPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).VerifyCompatibility(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_VerifyCompatibility_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).VerifyCompatibility(ctx, req.(*VerifyCompatibilityPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Route_ServiceDesc is the grpc.ServiceDesc for Route service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var Route_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _Route_Ping_Handler,
+		},
+		{
+			MethodName: "VerifyCompatibility",
+			Handler:    _Route_VerifyCompatibility_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

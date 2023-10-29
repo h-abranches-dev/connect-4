@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/h-abranches-dev/connect-4/game-client"
@@ -10,11 +11,14 @@ import (
 	"github.com/h-abranches-dev/connect-4/pkg/versions"
 	"github.com/version-go/ldflags"
 	"strings"
+	"time"
 )
 
 const (
 	gsDefaultHost = "127.0.0.1"
 	gsDefaultPort = 50052
+
+	verifyCompatibilityTimeout = 500 * time.Millisecond
 )
 
 var (
@@ -31,6 +35,8 @@ func main() {
 
 	conn, rc := gameclient.OpenNewConn(gsAddr)
 	defer utils.CloseConn(conn)
+
+	verifyCompatibility(rc)
 
 	start(rc)
 }
@@ -74,15 +80,15 @@ func clearConsole() {
 }
 
 func setVersion(v string) {
-	pv, err := versions.Set(v)
+	pv, err := versions.GetVersion(versions.Get(), v)
 	if err != nil {
 		panic(err)
 	}
-	gameclient.SetVersion(gameclient.GetVersion(), *pv)
+	gameclient.SetVersion(*pv)
 }
 
 func displayVersion() {
-	v := colors.FgRed(string(*gameclient.GetVersion()))
+	v := colors.FgRed(gameclient.GetVersion())
 	fmt.Printf("version: %s\n\n", v)
 }
 
@@ -92,4 +98,20 @@ func setGSAddr() {
 
 func displayGSAddr() {
 	fmt.Printf("game server address: %s\n\n", gsAddr)
+}
+
+func verifyCompatibility(rc gameserver.RouteClient) {
+	gcv := gameclient.GetVersion()
+
+	ctx, cancel := context.WithTimeout(context.Background(), verifyCompatibilityTimeout)
+	defer cancel()
+
+	_, err := rc.VerifyCompatibility(ctx, &gameserver.VerifyCompatibilityPayload{
+		GameClientVersion: gcv,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	displayVersion()
 }

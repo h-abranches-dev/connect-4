@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	gameengine "github.com/h-abranches-dev/connect-4/game-engine"
+	"github.com/h-abranches-dev/connect-4/pkg/utils"
 	"github.com/h-abranches-dev/connect-4/pkg/versions"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -30,12 +31,31 @@ func (gs *GameServer) Ping(ctx context.Context, payload *PingPayload) (*PingResp
 	return &PingResponse{Pong: "pong"}, nil
 }
 
-func GetVersion() *versions.Version {
-	return version
+func (gs *GameServer) VerifyCompatibility(ctx context.Context,
+	payload *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error) {
+
+	gsv := version
+
+	gcv := versions.Version{
+		Tag: payload.GameClientVersion,
+	}
+	if !gsv.Supports(gcv) {
+		return nil, utils.FormatErrors([]string{
+			fmt.Sprintf("game client version %q is not compatible with the game server version %q.",
+				gcv.Tag, gsv.Tag),
+			fmt.Sprintf("game client versions compatible with game server version %q: %s", gsv.Tag, versions.GetGameClientsVersions(gsv.SupportedVersions)),
+		})
+	}
+
+	return &VerifyCompatibilityResponse{GameServerVersion: gsv.Tag}, nil
 }
 
-func SetVersion(v *versions.Version, nv versions.Version) {
-	*v = nv
+func GetVersion() string {
+	return version.Tag
+}
+
+func SetVersion(nv versions.Version) {
+	*version = nv
 }
 
 // OpenNewConn set up a connection to the game engine creating a route client
