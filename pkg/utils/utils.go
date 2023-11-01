@@ -43,3 +43,7 @@ func MatchRegex(regex, s string) bool {
 	matched := r.MatchString(s)
 	return matched
 }
+
+func ClearConsole() {
+	fmt.Printf("\033[2J")
+}
