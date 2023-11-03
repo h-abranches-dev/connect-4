@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Route_Ping_FullMethodName                = "/gameengine.Route/Ping"
 	Route_VerifyCompatibility_FullMethodName = "/gameengine.Route/VerifyCompatibility"
+	Route_Connect_FullMethodName             = "/gameengine.Route/Connect"
+	Route_POL_FullMethodName                 = "/gameengine.Route/POL"
 )
 
 // RouteClient is the client API for Route service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RouteClient interface {
-	Ping(ctx context.Context, in *PingPayload, opts ...grpc.CallOption) (*PingResponse, error)
 	VerifyCompatibility(ctx context.Context, in *VerifyCompatibilityPayload, opts ...grpc.CallOption) (*VerifyCompatibilityResponse, error)
+	Connect(ctx context.Context, in *ConnectPayload, opts ...grpc.CallOption) (*ConnectResponse, error)
+	POL(ctx context.Context, in *POLPayload, opts ...grpc.CallOption) (*POLResponse, error)
 }
 
 type routeClient struct {
@@ -37,15 +39,6 @@ type routeClient struct {
 
 func NewRouteClient(cc grpc.ClientConnInterface) RouteClient {
 	return &routeClient{cc}
-}
-
-func (c *routeClient) Ping(ctx context.Context, in *PingPayload, opts ...grpc.CallOption) (*PingResponse, error) {
-	out := new(PingResponse)
-	err := c.cc.Invoke(ctx, Route_Ping_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *routeClient) VerifyCompatibility(ctx context.Context, in *VerifyCompatibilityPayload, opts ...grpc.CallOption) (*VerifyCompatibilityResponse, error) {
@@ -57,12 +50,31 @@ func (c *routeClient) VerifyCompatibility(ctx context.Context, in *VerifyCompati
 	return out, nil
 }
 
+func (c *routeClient) Connect(ctx context.Context, in *ConnectPayload, opts ...grpc.CallOption) (*ConnectResponse, error) {
+	out := new(ConnectResponse)
+	err := c.cc.Invoke(ctx, Route_Connect_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeClient) POL(ctx context.Context, in *POLPayload, opts ...grpc.CallOption) (*POLResponse, error) {
+	out := new(POLResponse)
+	err := c.cc.Invoke(ctx, Route_POL_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RouteServer is the server API for Route service.
 // All implementations must embed UnimplementedRouteServer
 // for forward compatibility
 type RouteServer interface {
-	Ping(context.Context, *PingPayload) (*PingResponse, error)
 	VerifyCompatibility(context.Context, *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error)
+	Connect(context.Context, *ConnectPayload) (*ConnectResponse, error)
+	POL(context.Context, *POLPayload) (*POLResponse, error)
 	mustEmbedUnimplementedRouteServer()
 }
 
@@ -70,11 +82,14 @@ type RouteServer interface {
 type UnimplementedRouteServer struct {
 }
 
-func (UnimplementedRouteServer) Ping(context.Context, *PingPayload) (*PingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
 func (UnimplementedRouteServer) VerifyCompatibility(context.Context, *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyCompatibility not implemented")
+}
+func (UnimplementedRouteServer) Connect(context.Context, *ConnectPayload) (*ConnectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
+}
+func (UnimplementedRouteServer) POL(context.Context, *POLPayload) (*POLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method POL not implemented")
 }
 func (UnimplementedRouteServer) mustEmbedUnimplementedRouteServer() {}
 
@@ -87,24 +102,6 @@ type UnsafeRouteServer interface {
 
 func RegisterRouteServer(s grpc.ServiceRegistrar, srv RouteServer) {
 	s.RegisterService(&Route_ServiceDesc, srv)
-}
-
-func _Route_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingPayload)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RouteServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Route_Ping_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RouteServer).Ping(ctx, req.(*PingPayload))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Route_VerifyCompatibility_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -125,6 +122,42 @@ func _Route_VerifyCompatibility_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Route_Connect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConnectPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).Connect(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_Connect_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).Connect(ctx, req.(*ConnectPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Route_POL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(POLPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).POL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_POL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).POL(ctx, req.(*POLPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Route_ServiceDesc is the grpc.ServiceDesc for Route service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -133,12 +166,16 @@ var Route_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*RouteServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Ping",
-			Handler:    _Route_Ping_Handler,
-		},
-		{
 			MethodName: "VerifyCompatibility",
 			Handler:    _Route_VerifyCompatibility_Handler,
+		},
+		{
+			MethodName: "Connect",
+			Handler:    _Route_Connect_Handler,
+		},
+		{
+			MethodName: "POL",
+			Handler:    _Route_POL_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

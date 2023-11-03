@@ -47,3 +47,10 @@ func MatchRegex(regex, s string) bool {
 func ClearConsole() {
 	fmt.Printf("\033[2J")
 }
+
+func PrintError(err error) {
+	if err == nil {
+		panic("err is nil")
+	}
+	fmt.Printf("error: %s\n", err.Error())
+}

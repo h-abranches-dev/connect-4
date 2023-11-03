@@ -5,14 +5,9 @@ package gameserver;
 option go_package = ".;gameserver";
 
 service Route {
-  rpc Ping (PingPayload) returns (PingResponse) {}
   rpc VerifyCompatibility (VerifyCompatibilityPayload) returns (VerifyCompatibilityResponse) {}
-}
-
-message PingPayload {}
-
-message PingResponse {
-  string pong = 1;
+  rpc Login (LoginPayload) returns (LoginResponse) {}
+  rpc POL (POLPayload) returns (POLResponse) {}
 }
 
 message VerifyCompatibilityPayload {
@@ -21,4 +16,20 @@ message VerifyCompatibilityPayload {
 
 message VerifyCompatibilityResponse {
   string gameServerVersion = 1;
+}
+
+message LoginPayload {
+}
+
+message LoginResponse {
+  string token = 1;
+  string err = 2;
+}
+
+message POLPayload {
+  string sessionToken = 1;
+}
+
+message POLResponse {
+  string err = 1;
 }

@@ -19,45 +19,54 @@ const (
 var (
 	gsHost = flag.String("gsHost", gsDefaultHost, "the game server host")
 	gsPort = flag.Int("gsPort", gsDefaultPort, "the game server port")
-	gsAddr string
+	gsAddr = new(string)
+
+	stopGame = make(chan bool)
 )
 
 func main() {
 	flag.Parse()
 
-	setGSAddr()
-	setVersion(ldflags.Version())
+	gameclient.SetGSAddr(gsAddr, *gsHost, *gsPort)
 
-	conn, rc := gameclient.OpenNewConn(gsAddr)
-	defer utils.CloseConn(conn)
-
-	verifyCompatibility(rc)
-
-	start(rc)
-}
-
-func initialize() {
-	gameTitle := colors.FgRed("CONNECT-4")
-	fmt.Printf("\n%s\n\n", gameTitle)
-
-	displayVersion()
-	displayGSAddr()
-}
-
-func start(rc gameserver.RouteClient) {
-	utils.ClearConsole()
-
-	initialize()
-
-	err := gameclient.PingGameServer(rc)
-	if err != nil {
-		fmt.Printf("%s\n\n", err.Error())
+	if err := gameclient.SetVersion(ldflags.Version()); err != nil {
+		utils.PrintError(err)
 		return
 	}
 
+	conn, rc, err := gameclient.OpenNewConn(*gsAddr)
+	if err != nil {
+		utils.PrintError(err)
+		return
+	}
+	defer utils.CloseConn(conn)
+
+	if err = gameclient.VerifyCompatibility(rc); err != nil {
+		utils.PrintError(err)
+		return
+	}
+
+	if err = start(*gsAddr, rc); err != nil {
+		fmt.Printf("\n%s\n", err.Error())
+	}
+}
+
+func initialize(gsAddr string) {
+	gameTitle := colors.FgRed("CONNECT-4")
+	fmt.Printf("\n%s\n\n", gameTitle)
+
+	gameclient.DisplayVersion()
+	gameclient.DisplayGSAddr(gsAddr)
+}
+
+func start(gsAddr string, rc gameserver.RouteClient) error {
+	utils.ClearConsole()
+
+	initialize(gsAddr)
+
 	fmt.Printf("Write 'START': ")
 	var input string
-	_, err = fmt.Scanln(&input)
+	_, err := fmt.Scanln(&input)
 	for err != nil || strings.ToUpper(input) != "START" {
 		utils.ClearConsole()
 
@@ -67,5 +76,17 @@ func start(rc gameserver.RouteClient) {
 		_, err = fmt.Scanln(&input)
 	}
 
-	fmt.Println()
+	sessionToken, err := gameclient.Login(rc)
+	if err != nil {
+		utils.PrintError(err)
+		return err
+	}
+
+	go gameclient.SendPOL(rc, *sessionToken, stopGame)
+
+	fmt.Printf("\nlogin has succeeded\n\n")
+
+	<-stopGame
+
+	return nil
 }

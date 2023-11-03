@@ -2,13 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	gameserver "github.com/h-abranches-dev/connect-4/game-server"
-	"github.com/h-abranches-dev/connect-4/pkg/colors"
 	"github.com/h-abranches-dev/connect-4/pkg/utils"
 	"github.com/version-go/ldflags"
-	"google.golang.org/grpc"
-	"net"
 )
 
 const (
@@ -21,41 +17,48 @@ var (
 	port   = flag.Int("port", defaultPort, "the game server port")
 	geHost = flag.String("geHost", geDefaultHost, "the game engine host")
 	gePort = flag.Int("gePort", geDefaultPort, "the game engine port")
-	geAddr string
+	geAddr = new(string)
+
+	stopGS = make(chan bool)
 )
 
 func main() {
 	flag.Parse()
 
-	setGEAddr()
-	setVersion(ldflags.Version())
+	gameserver.SetGEAddr(geAddr, *geHost, *gePort)
 
-	conn, rc := gameserver.OpenNewConn(geAddr)
+	if err := gameserver.SetVersion(ldflags.Version()); err != nil {
+		utils.PrintError(err)
+		return
+	}
+
+	conn, rc, err := gameserver.OpenNewConn(*geAddr)
+	if err != nil {
+		utils.PrintError(err)
+		return
+	}
 	defer utils.CloseConn(conn)
 
-	verifyCompatibility(rc)
-	displayGEAddr()
+	if err = gameserver.VerifyCompatibility(rc); err != nil {
+		utils.PrintError(err)
+		return
+	}
 
-	err := gameserver.PingGameEngine(rc)
+	gameserver.DisplayGEAddr(*geAddr)
+
+	sessionToken, err := gameserver.Connect(rc)
 	if err != nil {
-		fmt.Printf("%s\n\n", err.Error())
+		utils.PrintError(err)
 		return
 	}
 
-	listSrvAddr := utils.ListSrvAddr(*port)
-	lis, err := net.Listen("tcp", listSrvAddr)
-	if err != nil {
-		fmt.Printf("failed to create listener: %s\n\n", err.Error())
-		return
-	}
+	go gameserver.SendPOL(rc, *sessionToken, stopGS)
 
-	grpcServer := grpc.NewServer()
-	gameserver.RegisterRouteServer(grpcServer, gameserver.NewGameServer())
+	go func() {
+		if err = gameserver.StartGRPCServer(*port); err != nil {
+			utils.PrintError(err)
+		}
+	}()
 
-	fmt.Printf("game server is listening on the address %s\n", colors.FgRed(lis.Addr().String()))
-
-	if err = grpcServer.Serve(lis); err != nil {
-		fmt.Printf("%s\n\n", err.Error())
-		return
-	}
+	<-stopGS
 }

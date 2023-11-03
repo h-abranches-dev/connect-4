@@ -20,91 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type PingPayload struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *PingPayload) Reset() {
-	*x = PingPayload{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_game_engine_game_engine_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PingPayload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PingPayload) ProtoMessage() {}
-
-func (x *PingPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_game_engine_game_engine_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PingPayload.ProtoReflect.Descriptor instead.
-func (*PingPayload) Descriptor() ([]byte, []int) {
-	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{0}
-}
-
-type PingResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Pong string `protobuf:"bytes,1,opt,name=pong,proto3" json:"pong,omitempty"`
-}
-
-func (x *PingResponse) Reset() {
-	*x = PingResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_game_engine_game_engine_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PingResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PingResponse) ProtoMessage() {}
-
-func (x *PingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_engine_game_engine_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
-func (*PingResponse) Descriptor() ([]byte, []int) {
-	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *PingResponse) GetPong() string {
-	if x != nil {
-		return x.Pong
-	}
-	return ""
-}
-
 type VerifyCompatibilityPayload struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -116,7 +31,7 @@ type VerifyCompatibilityPayload struct {
 func (x *VerifyCompatibilityPayload) Reset() {
 	*x = VerifyCompatibilityPayload{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_game_engine_game_engine_proto_msgTypes[2]
+		mi := &file_game_engine_game_engine_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -129,7 +44,7 @@ func (x *VerifyCompatibilityPayload) String() string {
 func (*VerifyCompatibilityPayload) ProtoMessage() {}
 
 func (x *VerifyCompatibilityPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_game_engine_game_engine_proto_msgTypes[2]
+	mi := &file_game_engine_game_engine_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -142,7 +57,7 @@ func (x *VerifyCompatibilityPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyCompatibilityPayload.ProtoReflect.Descriptor instead.
 func (*VerifyCompatibilityPayload) Descriptor() ([]byte, []int) {
-	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{2}
+	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *VerifyCompatibilityPayload) GetGameServerVersion() string {
@@ -163,7 +78,7 @@ type VerifyCompatibilityResponse struct {
 func (x *VerifyCompatibilityResponse) Reset() {
 	*x = VerifyCompatibilityResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_game_engine_game_engine_proto_msgTypes[3]
+		mi := &file_game_engine_game_engine_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -176,7 +91,7 @@ func (x *VerifyCompatibilityResponse) String() string {
 func (*VerifyCompatibilityResponse) ProtoMessage() {}
 
 func (x *VerifyCompatibilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_engine_game_engine_proto_msgTypes[3]
+	mi := &file_game_engine_game_engine_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -189,7 +104,7 @@ func (x *VerifyCompatibilityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyCompatibilityResponse.ProtoReflect.Descriptor instead.
 func (*VerifyCompatibilityResponse) Descriptor() ([]byte, []int) {
-	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{3}
+	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *VerifyCompatibilityResponse) GetGameEngineVersion() string {
@@ -199,35 +114,233 @@ func (x *VerifyCompatibilityResponse) GetGameEngineVersion() string {
 	return ""
 }
 
+type ConnectPayload struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ConnectPayload) Reset() {
+	*x = ConnectPayload{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_game_engine_game_engine_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConnectPayload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectPayload) ProtoMessage() {}
+
+func (x *ConnectPayload) ProtoReflect() protoreflect.Message {
+	mi := &file_game_engine_game_engine_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectPayload.ProtoReflect.Descriptor instead.
+func (*ConnectPayload) Descriptor() ([]byte, []int) {
+	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{2}
+}
+
+type ConnectResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Err   string `protobuf:"bytes,2,opt,name=err,proto3" json:"err,omitempty"`
+}
+
+func (x *ConnectResponse) Reset() {
+	*x = ConnectResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_game_engine_game_engine_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConnectResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectResponse) ProtoMessage() {}
+
+func (x *ConnectResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_engine_game_engine_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectResponse.ProtoReflect.Descriptor instead.
+func (*ConnectResponse) Descriptor() ([]byte, []int) {
+	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ConnectResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *ConnectResponse) GetErr() string {
+	if x != nil {
+		return x.Err
+	}
+	return ""
+}
+
+type POLPayload struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SessionToken string `protobuf:"bytes,1,opt,name=sessionToken,proto3" json:"sessionToken,omitempty"`
+}
+
+func (x *POLPayload) Reset() {
+	*x = POLPayload{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_game_engine_game_engine_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *POLPayload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*POLPayload) ProtoMessage() {}
+
+func (x *POLPayload) ProtoReflect() protoreflect.Message {
+	mi := &file_game_engine_game_engine_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use POLPayload.ProtoReflect.Descriptor instead.
+func (*POLPayload) Descriptor() ([]byte, []int) {
+	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *POLPayload) GetSessionToken() string {
+	if x != nil {
+		return x.SessionToken
+	}
+	return ""
+}
+
+type POLResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Err string `protobuf:"bytes,1,opt,name=err,proto3" json:"err,omitempty"`
+}
+
+func (x *POLResponse) Reset() {
+	*x = POLResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_game_engine_game_engine_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *POLResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*POLResponse) ProtoMessage() {}
+
+func (x *POLResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_engine_game_engine_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use POLResponse.ProtoReflect.Descriptor instead.
+func (*POLResponse) Descriptor() ([]byte, []int) {
+	return file_game_engine_game_engine_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *POLResponse) GetErr() string {
+	if x != nil {
+		return x.Err
+	}
+	return ""
+}
+
 var File_game_engine_game_engine_proto protoreflect.FileDescriptor
 
 var file_game_engine_game_engine_proto_rawDesc = []byte{
 	0x0a, 0x1d, 0x67, 0x61, 0x6d, 0x65, 0x2d, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2f, 0x67, 0x61,
 	0x6d, 0x65, 0x5f, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
-	0x0a, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x22, 0x0d, 0x0a, 0x0b, 0x50,
-	0x69, 0x6e, 0x67, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x22, 0x22, 0x0a, 0x0c, 0x50, 0x69,
-	0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f,
-	0x6e, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x6f, 0x6e, 0x67, 0x22, 0x4a,
-	0x0a, 0x1a, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69, 0x62,
-	0x69, 0x6c, 0x69, 0x74, 0x79, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x2c, 0x0a, 0x11,
-	0x67, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f,
-	0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x67, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x72,
-	0x76, 0x65, 0x72, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x4b, 0x0a, 0x1b, 0x56, 0x65,
-	0x72, 0x69, 0x66, 0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69, 0x62, 0x69, 0x6c, 0x69, 0x74,
-	0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2c, 0x0a, 0x11, 0x67, 0x61, 0x6d,
-	0x65, 0x45, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x67, 0x61, 0x6d, 0x65, 0x45, 0x6e, 0x67, 0x69, 0x6e, 0x65,
-	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x32, 0xae, 0x01, 0x0a, 0x05, 0x52, 0x6f, 0x75, 0x74,
-	0x65, 0x12, 0x3b, 0x0a, 0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x17, 0x2e, 0x67, 0x61, 0x6d, 0x65,
-	0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x50, 0x61, 0x79, 0x6c, 0x6f,
-	0x61, 0x64, 0x1a, 0x18, 0x2e, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e,
-	0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x68,
+	0x0a, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x22, 0x4a, 0x0a, 0x1a, 0x56,
+	0x65, 0x72, 0x69, 0x66, 0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69, 0x62, 0x69, 0x6c, 0x69,
+	0x74, 0x79, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x2c, 0x0a, 0x11, 0x67, 0x61, 0x6d,
+	0x65, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x67, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
+	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x4b, 0x0a, 0x1b, 0x56, 0x65, 0x72, 0x69, 0x66,
+	0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2c, 0x0a, 0x11, 0x67, 0x61, 0x6d, 0x65, 0x45, 0x6e,
+	0x67, 0x69, 0x6e, 0x65, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x11, 0x67, 0x61, 0x6d, 0x65, 0x45, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x56, 0x65, 0x72,
+	0x73, 0x69, 0x6f, 0x6e, 0x22, 0x10, 0x0a, 0x0e, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x50,
+	0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x22, 0x39, 0x0a, 0x0f, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b,
+	0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x12,
+	0x10, 0x0a, 0x03, 0x65, 0x72, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x65, 0x72,
+	0x72, 0x22, 0x30, 0x0a, 0x0a, 0x50, 0x4f, 0x4c, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12,
+	0x22, 0x0a, 0x0c, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x22, 0x1f, 0x0a, 0x0b, 0x50, 0x4f, 0x4c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x65, 0x72, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x03, 0x65, 0x72, 0x72, 0x32, 0xf1, 0x01, 0x0a, 0x05, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x12, 0x68,
 	0x0a, 0x13, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69, 0x62,
 	0x69, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x26, 0x2e, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69,
 	0x6e, 0x65, 0x2e, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69,
 	0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x1a, 0x27, 0x2e,
 	0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e, 0x56, 0x65, 0x72, 0x69, 0x66,
 	0x79, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x74, 0x69, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x44, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x6e,
+	0x65, 0x63, 0x74, 0x12, 0x1a, 0x2e, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65,
+	0x2e, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x1a,
+	0x1b, 0x2e, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e, 0x43, 0x6f, 0x6e,
+	0x6e, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x38,
+	0x0a, 0x03, 0x50, 0x4f, 0x4c, 0x12, 0x16, 0x2e, 0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69,
+	0x6e, 0x65, 0x2e, 0x50, 0x4f, 0x4c, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x1a, 0x17, 0x2e,
+	0x67, 0x61, 0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e, 0x50, 0x4f, 0x4c, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x0e, 0x5a, 0x0c, 0x2e, 0x3b, 0x67, 0x61,
 	0x6d, 0x65, 0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
@@ -244,20 +357,24 @@ func file_game_engine_game_engine_proto_rawDescGZIP() []byte {
 	return file_game_engine_game_engine_proto_rawDescData
 }
 
-var file_game_engine_game_engine_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_game_engine_game_engine_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_game_engine_game_engine_proto_goTypes = []interface{}{
-	(*PingPayload)(nil),                 // 0: gameengine.PingPayload
-	(*PingResponse)(nil),                // 1: gameengine.PingResponse
-	(*VerifyCompatibilityPayload)(nil),  // 2: gameengine.VerifyCompatibilityPayload
-	(*VerifyCompatibilityResponse)(nil), // 3: gameengine.VerifyCompatibilityResponse
+	(*VerifyCompatibilityPayload)(nil),  // 0: gameengine.VerifyCompatibilityPayload
+	(*VerifyCompatibilityResponse)(nil), // 1: gameengine.VerifyCompatibilityResponse
+	(*ConnectPayload)(nil),              // 2: gameengine.ConnectPayload
+	(*ConnectResponse)(nil),             // 3: gameengine.ConnectResponse
+	(*POLPayload)(nil),                  // 4: gameengine.POLPayload
+	(*POLResponse)(nil),                 // 5: gameengine.POLResponse
 }
 var file_game_engine_game_engine_proto_depIdxs = []int32{
-	0, // 0: gameengine.Route.Ping:input_type -> gameengine.PingPayload
-	2, // 1: gameengine.Route.VerifyCompatibility:input_type -> gameengine.VerifyCompatibilityPayload
-	1, // 2: gameengine.Route.Ping:output_type -> gameengine.PingResponse
-	3, // 3: gameengine.Route.VerifyCompatibility:output_type -> gameengine.VerifyCompatibilityResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 0: gameengine.Route.VerifyCompatibility:input_type -> gameengine.VerifyCompatibilityPayload
+	2, // 1: gameengine.Route.Connect:input_type -> gameengine.ConnectPayload
+	4, // 2: gameengine.Route.POL:input_type -> gameengine.POLPayload
+	1, // 3: gameengine.Route.VerifyCompatibility:output_type -> gameengine.VerifyCompatibilityResponse
+	3, // 4: gameengine.Route.Connect:output_type -> gameengine.ConnectResponse
+	5, // 5: gameengine.Route.POL:output_type -> gameengine.POLResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -270,30 +387,6 @@ func file_game_engine_game_engine_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_game_engine_game_engine_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PingPayload); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_game_engine_game_engine_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PingResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_game_engine_game_engine_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*VerifyCompatibilityPayload); i {
 			case 0:
 				return &v.state
@@ -305,8 +398,56 @@ func file_game_engine_game_engine_proto_init() {
 				return nil
 			}
 		}
-		file_game_engine_game_engine_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_game_engine_game_engine_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*VerifyCompatibilityResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_game_engine_game_engine_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ConnectPayload); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_game_engine_game_engine_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ConnectResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_game_engine_game_engine_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*POLPayload); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_game_engine_game_engine_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*POLResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -324,7 +465,7 @@ func file_game_engine_game_engine_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_game_engine_game_engine_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
