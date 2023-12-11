@@ -2,20 +2,8 @@ package versions
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 )
-
-func TestGet(t *testing.T) {
-	got := Get()
-	want := []Version{
-		gcV001, gsV001, gsV002, geV001, gsV003, gsV004, gcV003,
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v want %v", got, want)
-	}
-}
 
 func TestGetVersion(t *testing.T) {
 	vs := []Version{{

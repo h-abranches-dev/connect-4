@@ -1,7 +1,7 @@
 # connect-4
 Connect 4 multiplayer terminal game
 
-You need to have the game engine before you run the game server.
+You need to have the game engine running before you run the game server.
 
 You need to have the game server running before you run the game client.
 

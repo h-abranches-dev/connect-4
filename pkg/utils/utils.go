@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
@@ -26,7 +25,7 @@ func CloseConn(conn *grpc.ClientConn) {
 
 func FormatErrors(errs []string) error {
 	if errs == nil || len(errs) == 0 {
-		return errors.New("{  }")
+		return fmt.Errorf("{  }")
 	}
 	return fmt.Errorf("{\n\t%s\n}", strings.Join(errs, "\n\t"))
 }
@@ -45,12 +44,9 @@ func MatchRegex(regex, s string) bool {
 }
 
 func ClearConsole() {
-	fmt.Printf("\033[2J")
+	fmt.Printf("\033[2J\n")
 }
 
 func PrintError(err error) {
-	if err == nil {
-		panic("err is nil")
-	}
-	fmt.Printf("error: %s\n", err.Error())
+	fmt.Printf("\nerrors: %s\n\n", err.Error())
 }

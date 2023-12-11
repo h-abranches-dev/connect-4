@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	gameengine "github.com/h-abranches-dev/connect-4/game-engine"
 	gameserver "github.com/h-abranches-dev/connect-4/game-server"
 	"github.com/h-abranches-dev/connect-4/pkg/utils"
 	"github.com/version-go/ldflags"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -17,42 +19,56 @@ var (
 	port   = flag.Int("port", defaultPort, "the game server port")
 	geHost = flag.String("geHost", geDefaultHost, "the game engine host")
 	gePort = flag.Int("gePort", geDefaultPort, "the game engine port")
-	geAddr = new(string)
+	geAddr string
 
-	stopGS = make(chan bool)
+	rc gameengine.RouteClient
+
+	errCh = make(chan struct{})
 )
 
 func main() {
 	flag.Parse()
 
-	gameserver.SetGEAddr(geAddr, *geHost, *gePort)
+	gameserver.SetGEAddr(*geHost, *gePort)
+
+	geAddr = gameserver.GetGEAddr()
 
 	if err := gameserver.SetVersion(ldflags.Version()); err != nil {
 		utils.PrintError(err)
 		return
 	}
 
-	conn, rc, err := gameserver.OpenNewConn(*geAddr)
+	var conn *grpc.ClientConn
+	var err error
+	conn, rc, err = gameserver.OpenNewConnWithGameEngine(geAddr)
 	if err != nil {
 		utils.PrintError(err)
 		return
 	}
 	defer utils.CloseConn(conn)
+	gameserver.SetGERouteClient(rc)
 
-	if err = gameserver.VerifyCompatibility(rc); err != nil {
+	if err = gameserver.VerifyCompatibility(); err != nil {
 		utils.PrintError(err)
 		return
 	}
 
-	gameserver.DisplayGEAddr(*geAddr)
+	gameserver.DisplayVersion()
+	//gameserver.DisplayGEAddr()
 
-	sessionToken, err := gameserver.Connect(rc)
+	sessionToken, err := gameserver.Connect()
 	if err != nil {
 		utils.PrintError(err)
 		return
 	}
 
-	go gameserver.SendPOL(rc, *sessionToken, stopGS)
+	go func() {
+		err = gameserver.StartSendingPOL(*sessionToken)
+		if err != nil {
+			<-errCh
+			return
+		}
+	}()
 
 	go func() {
 		if err = gameserver.StartGRPCServer(*port); err != nil {
@@ -60,5 +76,10 @@ func main() {
 		}
 	}()
 
-	<-stopGS
+	// wait for some error
+	errCh <- struct{}{}
+
+	if err != nil {
+		utils.PrintError(err)
+	}
 }

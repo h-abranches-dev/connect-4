@@ -8,6 +8,10 @@ service Route {
   rpc VerifyCompatibility (VerifyCompatibilityPayload) returns (VerifyCompatibilityResponse) {}
   rpc Login (LoginPayload) returns (LoginResponse) {}
   rpc POL (POLPayload) returns (POLResponse) {}
+  rpc CheckMatchCanStart (CheckMatchCanStartPayload) returns (CheckMatchCanStartResponse) {}
+  rpc ServeBoard (ServeBoardPayload) returns (ServeBoardResponse) {}
+  rpc Play (PlayPayload) returns (PlayResponse) {}
+  rpc CheckBoardUpdated (CheckBoardUpdatedPayload) returns (CheckBoardUpdatedResponse) {}
 }
 
 message VerifyCompatibilityPayload {
@@ -22,8 +26,7 @@ message LoginPayload {
 }
 
 message LoginResponse {
-  string token = 1;
-  string err = 2;
+  string sessionToken = 1;
 }
 
 message POLPayload {
@@ -31,5 +34,40 @@ message POLPayload {
 }
 
 message POLResponse {
-  string err = 1;
+  string matchStatus = 1;
+}
+
+message CheckMatchCanStartPayload {
+  string sessionToken = 1;
+}
+
+message CheckMatchCanStartResponse {
+  bool canStart = 1;
+}
+
+message ServeBoardPayload {
+  string sessionToken = 1;
+}
+
+message ServeBoardResponse {
+  string board = 1;
+  string playerID = 2;
+}
+
+message PlayPayload {
+  string sessionToken = 1;
+  int32 column = 2;
+}
+
+message PlayResponse {
+  bool thereIsWinner = 1;
+  string error = 2;
+}
+
+message CheckBoardUpdatedPayload {
+  string sessionToken = 1;
+}
+
+message CheckBoardUpdatedResponse {
+  string feedback = 1;
 }

@@ -26,7 +26,7 @@ func SetVersion(v string) error {
 func DisplayVersion() {
 	gameTitle := colors.FgRed("CONNECT-4")
 	v := colors.FgRed(version.Tag)
-	fmt.Printf("%s game engine\n\n", gameTitle)
+	fmt.Printf("\n%s game engine\n\n", gameTitle)
 	fmt.Printf("version: %s\n\n", v)
 }
 

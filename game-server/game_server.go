@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/h-abranches-dev/connect-4/common"
+	game "github.com/h-abranches-dev/connect-4/common"
 	gameengine "github.com/h-abranches-dev/connect-4/game-engine"
 	"github.com/h-abranches-dev/connect-4/pkg/colors"
 	"github.com/h-abranches-dev/connect-4/pkg/utils"
@@ -13,29 +13,31 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
-type sendPOLService struct {
-	timeout      time.Duration
-	rc           gameengine.RouteClient
-	sessionToken uuid.UUID
-}
-
 const (
 	verifyCompatibilityTimeout = 500 * time.Millisecond
-	connectTimeout             = 5 * time.Second
+	connectTimeout             = 500 * time.Millisecond
 
 	polTimeout  = 500 * time.Millisecond
 	polInterval = 2 * time.Second
 )
 
 var (
+	geAddr  string
 	version = new(versions.Version)
+
+	rc gameengine.RouteClient
 )
 
-func SetGEAddr(addr *string, host string, port int) {
-	*addr = utils.NewAddress(host, port)
+func SetGEAddr(host string, port int) {
+	geAddr = utils.NewAddress(host, port)
+}
+
+func GetGEAddr() string {
+	return geAddr
 }
 
 func SetVersion(v string) error {
@@ -47,24 +49,29 @@ func SetVersion(v string) error {
 	return nil
 }
 
-// OpenNewConn set up a connection to the game engine creating a route client
-func OpenNewConn(geAddr string) (*grpc.ClientConn, gameengine.RouteClient, error) {
-	conn, err := grpc.Dial(geAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+func DisplayVersion() {
+	gameTitle := colors.FgRed("CONNECT-4")
+	v := colors.FgRed(version.Tag)
+	fmt.Printf("\n%s game server\n\n", gameTitle)
+	fmt.Printf("version: %s\n\n", v)
+}
+
+// OpenNewConnWithGameEngine set up a connection to the game engine creating a route client
+func OpenNewConnWithGameEngine(addr string) (*grpc.ClientConn, gameengine.RouteClient, error) {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// to enter here you can not pass the credentials, example: conn, err := grpc.Dial(*geAddr)
 	if err != nil {
-		return nil, nil, fmt.Errorf("it wasn't possible to create a connection with the game engine in %s\n", geAddr)
+		return nil, nil, fmt.Errorf(game.ConnNotPossibleErr, addr)
 	}
 
 	return conn, gameengine.NewRouteClient(conn), nil
 }
 
-func displayVersion() {
-	gameTitle := colors.FgRed("CONNECT-4")
-	v := colors.FgRed(version.Tag)
-	fmt.Printf("%s game server\n\n", gameTitle)
-	fmt.Printf("version: %s\n\n", v)
+func SetGERouteClient(nrc gameengine.RouteClient) {
+	rc = nrc
 }
 
-func VerifyCompatibility(rc gameengine.RouteClient) error {
+func VerifyCompatibility() error {
 	gsv := version.Tag
 
 	ctx, cancel := context.WithTimeout(context.Background(), verifyCompatibilityTimeout)
@@ -76,16 +83,15 @@ func VerifyCompatibility(rc gameengine.RouteClient) error {
 		return err
 	}
 
-	displayVersion()
-
 	return nil
 }
 
-func DisplayGEAddr(addr string) {
-	fmt.Printf("game engine address: %s\n\n", addr)
+// DisplayGEAddr optional
+func DisplayGEAddr() {
+	fmt.Printf("game engine address: %s\n\n", geAddr)
 }
 
-func Connect(rc gameengine.RouteClient) (*uuid.UUID, error) {
+func Connect() (*uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout)
 	defer cancel()
 
@@ -94,54 +100,83 @@ func Connect(rc gameengine.RouteClient) (*uuid.UUID, error) {
 		return nil, err
 	}
 
-	sessionToken, err := uuid.Parse(connectResp.Token)
+	sessionToken, err := uuid.Parse(connectResp.SessionToken)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(game.InvalidSessionTokenFormatErr)
 	}
 
 	return &sessionToken, nil
 }
 
-func newSendPOLService(rc gameengine.RouteClient, timeout time.Duration, sessionToken uuid.UUID) *sendPOLService {
-	return &sendPOLService{
-		timeout:      timeout,
-		rc:           rc,
-		sessionToken: sessionToken,
+func encodeBoards() string {
+	var boardsIDs []string
+	for _, m := range *activeMatches {
+		boardsIDs = append(boardsIDs, m.BoardID.String())
+	}
+	return strings.Join(boardsIDs, ";")
+}
+
+func removeOutdatedSession() {
+	var sessionsToRemove []string
+	for _, os := range *openSessions {
+		expirationTime := os.LastPOL.Add(sessionLastPOLExpirationInterval)
+		now := time.Now()
+		if expirationTime.Before(now) {
+			sessionsToRemove = append(sessionsToRemove, os.Token.String())
+		}
+	}
+	if len(sessionsToRemove) > 0 {
+		for _, sid := range sessionsToRemove {
+			removeGCSession(openSessions, sid)
+		}
 	}
 }
 
-func errWhenPOLfails() {
-	log.Printf("can't talk with game engine\n")
-	log.Printf("game server is quitting...\n")
-	log.Printf("i'm sorry for the inconvenience, bye!\n\n")
+func removeOutdatedMatches() {
+	for _, m := range *activeMatches {
+		if m.IsFinished() && (m.P1 == nil || m.P2 == nil) {
+			RemoveMatch(activeMatches, m.Id)
+			break
+		}
+		if m.StatusCode == Started && (m.P1 == nil || m.P2 == nil) {
+			m.StatusCode = Abandoned
+		}
+	}
 }
 
-func (s sendPOLService) Run(clientWillTerminate chan bool) {
-	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+func SendPOL(payload *gameengine.POLPayload) error {
+	ctx, cancel := context.WithTimeout(context.Background(), polTimeout)
 	defer cancel()
 
-	resp, err := s.rc.POL(ctx, &gameengine.POLPayload{
-		SessionToken: s.sessionToken.String(),
-	})
-	if err != nil {
-		errWhenPOLfails()
-		clientWillTerminate <- true
-		return
+	if _, err := rc.POL(ctx, payload); err != nil {
+		return err
 	}
-	if resp.Err != "" {
-		errWhenPOLfails()
-		clientWillTerminate <- true
-		return
-	}
+
+	return nil
 }
 
-func SendPOL(rc gameengine.RouteClient, sessionToken uuid.UUID, stopGS chan bool) {
-	stopPOLTicker := make(chan bool)
-	sendPOLServ := newSendPOLService(rc, polTimeout, sessionToken)
-	common.StartTicker(polInterval, sendPOLServ, stopPOLTicker)
-	select {
-	case <-stopPOLTicker:
-		stopGS <- true
+func StartSendingPOL(sessionToken uuid.UUID) error {
+	ticker := time.NewTicker(polInterval)
+
+	for {
+		select {
+		case <-ticker.C:
+			removeOutdatedSession()
+			removeOutdatedMatches()
+
+			if err := SendPOL(&gameengine.POLPayload{
+				SessionToken:  sessionToken.String(),
+				EncodedBoards: encodeBoards(),
+			}); err != nil {
+				ticker.Stop()
+				if strings.Contains(err.Error(), game.InvalidSessionTokenFormatErr) ||
+					strings.Contains(err.Error(), game.InvalidSessionTokenErr) {
+					return fmt.Errorf("%s => %s", game.CannotConnWithGEErr, err.Error())
+				} else {
+					return fmt.Errorf("%s => %s", game.NoConnWithGEErr, err.Error())
+				}
+			}
+		}
 	}
 }
 

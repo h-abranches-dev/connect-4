@@ -4,36 +4,43 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/h-abranches-dev/connect-4/common"
+	game "github.com/h-abranches-dev/connect-4/common"
 	gameserver "github.com/h-abranches-dev/connect-4/game-server"
 	"github.com/h-abranches-dev/connect-4/pkg/colors"
 	"github.com/h-abranches-dev/connect-4/pkg/utils"
 	"github.com/h-abranches-dev/connect-4/pkg/versions"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"strings"
 	"time"
 )
-
-type sendPOLService struct {
-	timeout      time.Duration
-	rc           gameserver.RouteClient
-	sessionToken uuid.UUID
-}
 
 const (
 	verifyCompatibilityTimeout = 500 * time.Millisecond
 	loginTimeout               = 5 * time.Second
 
-	polTimeout  = 500 * time.Millisecond
-	polInterval = 2 * time.Second
+	polTimeout                 = 500 * time.Millisecond
+	polInterval                = 2 * time.Second
+	checkMatchCanStartTimeout  = 500 * time.Millisecond
+	checkMatchCanStartInterval = 2 * time.Second
+
+	serveBoardTimeout = 500 * time.Millisecond
+	playTimeout       = 10000 * time.Millisecond
 )
 
 var (
+	gsAddr  string
 	version = new(versions.Version)
+
+	rc gameserver.RouteClient
 )
 
-func SetGSAddr(addr *string, host string, port int) {
-	*addr = utils.NewAddress(host, port)
+func SetGSAddr(host string, port int) {
+	gsAddr = utils.NewAddress(host, port)
+}
+
+func GetGSAddr() string {
+	return gsAddr
 }
 
 func SetVersion(v string) error {
@@ -50,21 +57,27 @@ func DisplayVersion() {
 	fmt.Printf("version: %s\n\n", v)
 }
 
+// DisplayGSAddr optional
 func DisplayGSAddr(addr string) {
 	fmt.Printf("game server address: %s\n\n", addr)
 }
 
-// OpenNewConn set up a connection to the game server creating a route client
-func OpenNewConn(gsAddr string) (*grpc.ClientConn, gameserver.RouteClient, error) {
-	conn, err := grpc.Dial(gsAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+// OpenNewConnWithGameServer set up a connection to the game server creating a route client
+func OpenNewConnWithGameServer(addr string) (*grpc.ClientConn, gameserver.RouteClient, error) {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// to enter here you can not pass the credentials, example: conn, err := grpc.Dial(*geAddr)
 	if err != nil {
-		return nil, nil, fmt.Errorf("it wasn't possible to create a connection with the game server in %s\n", gsAddr)
+		return nil, nil, fmt.Errorf(game.ConnNotPossibleErr, addr)
 	}
 
 	return conn, gameserver.NewRouteClient(conn), nil
 }
 
-func VerifyCompatibility(rc gameserver.RouteClient) error {
+func SetGSRouteClient(nrc gameserver.RouteClient) {
+	rc = nrc
+}
+
+func VerifyCompatibility() error {
 	gcv := version.Tag
 
 	ctx, cancel := context.WithTimeout(context.Background(), verifyCompatibilityTimeout)
@@ -79,7 +92,7 @@ func VerifyCompatibility(rc gameserver.RouteClient) error {
 	return nil
 }
 
-func Login(rc gameserver.RouteClient) (*uuid.UUID, error) {
+func Login() (*uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), loginTimeout)
 	defer cancel()
 
@@ -88,53 +101,121 @@ func Login(rc gameserver.RouteClient) (*uuid.UUID, error) {
 		return nil, err
 	}
 
-	sessionToken, err := uuid.Parse(loginResp.Token)
+	sessionToken, err := uuid.Parse(loginResp.SessionToken)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(game.InvalidSessionTokenFormatErr)
 	}
 
 	return &sessionToken, nil
 }
 
-func newSendPOLService(rc gameserver.RouteClient, timeout time.Duration, sessionToken uuid.UUID) *sendPOLService {
-	return &sendPOLService{
-		timeout:      timeout,
-		rc:           rc,
-		sessionToken: sessionToken,
-	}
-}
-
-func errWhenPOLfails() {
-	fmt.Printf("can't talk with game server\n")
-	fmt.Printf("game is quitting...\n")
-	fmt.Printf("i'm sorry for the inconvenience, bye!\n\n")
-}
-
-func (s sendPOLService) Run(clientWillTerminate chan bool) {
-	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+func SendPOL(payload *gameserver.POLPayload) error {
+	ctx, cancel := context.WithTimeout(context.Background(), polTimeout)
 	defer cancel()
 
-	resp, err := s.rc.POL(ctx, &gameserver.POLPayload{
-		SessionToken: s.sessionToken.String(),
-	})
-	if err != nil {
-		errWhenPOLfails()
-		clientWillTerminate <- true
-		return
+	if _, err := rc.POL(ctx, payload); err != nil {
+		return err
 	}
-	if resp.Err != "" {
-		errWhenPOLfails()
-		clientWillTerminate <- true
-		return
+
+	return nil
+}
+
+func StartSendingPOL(sessionToken uuid.UUID) error {
+	ticker := time.NewTicker(polInterval)
+
+	for {
+		select {
+		case <-ticker.C:
+			if err := SendPOL(&gameserver.POLPayload{
+				SessionToken: sessionToken.String(),
+			}); err != nil {
+				ticker.Stop()
+				if strings.Contains(err.Error(), game.InvalidSessionTokenFormatErr) ||
+					strings.Contains(err.Error(), game.InvalidSessionTokenErr) {
+					return fmt.Errorf("%s => %s", game.CannotConnWithGSErr, err.Error())
+				} else {
+					return fmt.Errorf("%s => %s", game.NoConnWithGSErr, err.Error())
+				}
+			}
+		}
 	}
 }
 
-func SendPOL(rc gameserver.RouteClient, sessionToken uuid.UUID, stopGame chan bool) {
-	stopPOLTicker := make(chan bool)
-	sendPOLServ := newSendPOLService(rc, polTimeout, sessionToken)
-	common.StartTicker(polInterval, sendPOLServ, stopPOLTicker)
-	select {
-	case <-stopPOLTicker:
-		stopGame <- true
+func checkMatchCanStart(payload *gameserver.CheckMatchCanStartPayload, checkMatchCanStartCh chan bool,
+	checkMatchCanStartErrCh chan error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), checkMatchCanStartTimeout)
+	defer cancel()
+
+	resp, err := rc.CheckMatchCanStart(ctx, payload)
+	if err != nil {
+		checkMatchCanStartErrCh <- err
 	}
+
+	if resp != nil && resp.CanStart {
+		checkMatchCanStartCh <- resp.CanStart
+	} else {
+		fmt.Printf("\rWaiting for other play to join...")
+	}
+}
+
+func StartCheckingMatchCanStart(sessionToken uuid.UUID, errCh chan error) (bool, error) {
+	ticker := time.NewTicker(checkMatchCanStartInterval)
+	checkMatchCanStartCh := make(chan bool)
+	checkMatchCanStartErrCh := make(chan error)
+
+	for {
+		select {
+		case <-checkMatchCanStartCh:
+			ticker.Stop()
+			return true, nil
+		case err := <-checkMatchCanStartErrCh:
+			ticker.Stop()
+			return false, err
+		case err := <-errCh:
+			ticker.Stop()
+			return false, err
+		case <-ticker.C:
+			go checkMatchCanStart(&gameserver.CheckMatchCanStartPayload{
+				SessionToken: sessionToken.String(),
+			}, checkMatchCanStartCh, checkMatchCanStartErrCh)
+		}
+	}
+}
+
+func GetPlayerIDAndBoard(sessionToken uuid.UUID) (*string, *string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), serveBoardTimeout)
+	defer cancel()
+
+	resp, err := rc.ServeBoard(ctx, &gameserver.ServeBoardPayload{
+		SessionToken: sessionToken.String(),
+	})
+	if resp == nil && err != nil {
+		return nil, nil, err
+	}
+
+	return &resp.PlayerID, &resp.Board, err
+}
+
+func Play(sessionToken uuid.UUID, column int) (bool, error) {
+	fmt.Printf("\n")
+	ctx, cancel := context.WithTimeout(context.Background(), playTimeout)
+	defer cancel()
+	resp, err := rc.Play(ctx, &gameserver.PlayPayload{
+		SessionToken: sessionToken.String(),
+		Column:       int32(column),
+	})
+	if err != nil {
+		return false, err
+	}
+
+	if resp.ThereIsWinner {
+		if resp.Error != "" {
+			return true, fmt.Errorf(resp.Error)
+		} else {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

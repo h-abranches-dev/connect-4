@@ -22,6 +22,8 @@ const (
 	Route_VerifyCompatibility_FullMethodName = "/gameengine.Route/VerifyCompatibility"
 	Route_Connect_FullMethodName             = "/gameengine.Route/Connect"
 	Route_POL_FullMethodName                 = "/gameengine.Route/POL"
+	Route_ServeBoard_FullMethodName          = "/gameengine.Route/ServeBoard"
+	Route_Play_FullMethodName                = "/gameengine.Route/Play"
 )
 
 // RouteClient is the client API for Route service.
@@ -31,6 +33,8 @@ type RouteClient interface {
 	VerifyCompatibility(ctx context.Context, in *VerifyCompatibilityPayload, opts ...grpc.CallOption) (*VerifyCompatibilityResponse, error)
 	Connect(ctx context.Context, in *ConnectPayload, opts ...grpc.CallOption) (*ConnectResponse, error)
 	POL(ctx context.Context, in *POLPayload, opts ...grpc.CallOption) (*POLResponse, error)
+	ServeBoard(ctx context.Context, in *ServeBoardPayload, opts ...grpc.CallOption) (*ServeBoardResponse, error)
+	Play(ctx context.Context, in *PlayPayload, opts ...grpc.CallOption) (*PlayResponse, error)
 }
 
 type routeClient struct {
@@ -68,6 +72,24 @@ func (c *routeClient) POL(ctx context.Context, in *POLPayload, opts ...grpc.Call
 	return out, nil
 }
 
+func (c *routeClient) ServeBoard(ctx context.Context, in *ServeBoardPayload, opts ...grpc.CallOption) (*ServeBoardResponse, error) {
+	out := new(ServeBoardResponse)
+	err := c.cc.Invoke(ctx, Route_ServeBoard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeClient) Play(ctx context.Context, in *PlayPayload, opts ...grpc.CallOption) (*PlayResponse, error) {
+	out := new(PlayResponse)
+	err := c.cc.Invoke(ctx, Route_Play_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RouteServer is the server API for Route service.
 // All implementations must embed UnimplementedRouteServer
 // for forward compatibility
@@ -75,6 +97,8 @@ type RouteServer interface {
 	VerifyCompatibility(context.Context, *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error)
 	Connect(context.Context, *ConnectPayload) (*ConnectResponse, error)
 	POL(context.Context, *POLPayload) (*POLResponse, error)
+	ServeBoard(context.Context, *ServeBoardPayload) (*ServeBoardResponse, error)
+	Play(context.Context, *PlayPayload) (*PlayResponse, error)
 	mustEmbedUnimplementedRouteServer()
 }
 
@@ -90,6 +114,12 @@ func (UnimplementedRouteServer) Connect(context.Context, *ConnectPayload) (*Conn
 }
 func (UnimplementedRouteServer) POL(context.Context, *POLPayload) (*POLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method POL not implemented")
+}
+func (UnimplementedRouteServer) ServeBoard(context.Context, *ServeBoardPayload) (*ServeBoardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ServeBoard not implemented")
+}
+func (UnimplementedRouteServer) Play(context.Context, *PlayPayload) (*PlayResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
 func (UnimplementedRouteServer) mustEmbedUnimplementedRouteServer() {}
 
@@ -158,6 +188,42 @@ func _Route_POL_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Route_ServeBoard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ServeBoardPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).ServeBoard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_ServeBoard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).ServeBoard(ctx, req.(*ServeBoardPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Route_Play_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).Play(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_Play_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).Play(ctx, req.(*PlayPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Route_ServiceDesc is the grpc.ServiceDesc for Route service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +242,14 @@ var Route_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "POL",
 			Handler:    _Route_POL_Handler,
+		},
+		{
+			MethodName: "ServeBoard",
+			Handler:    _Route_ServeBoard_Handler,
+		},
+		{
+			MethodName: "Play",
+			Handler:    _Route_Play_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

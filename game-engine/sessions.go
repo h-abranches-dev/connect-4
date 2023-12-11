@@ -1,20 +1,20 @@
-package common
+package gameengine
 
 import (
 	"github.com/google/uuid"
 	"time"
 )
 
-type Session struct {
+type GSSession struct {
 	ID        uuid.UUID
 	StartTime time.Time
 	LastPOL   time.Time
 	Token     uuid.UUID
 }
 
-func NewSession() *Session {
+func NewGSSession() *GSSession {
 	startTime := time.Now()
-	return &Session{
+	return &GSSession{
 		ID:        uuid.New(),
 		StartTime: startTime,
 		LastPOL:   startTime,

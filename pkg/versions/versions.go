@@ -2,6 +2,7 @@ package versions
 
 import (
 	"fmt"
+	game "github.com/h-abranches-dev/connect-4/common"
 	"github.com/h-abranches-dev/connect-4/pkg/utils"
 	"strings"
 )
@@ -19,29 +20,8 @@ var (
 	gcV001 = Version{
 		Tag: "gc-v0.0.1",
 	}
-	gcV003 = Version{
-		Tag: "gc-v0.0.3",
-	}
 	gsV001 = Version{
 		Tag: "gs-v0.0.1",
-		SupportedVersions: []*Version{
-			&gcV001,
-		},
-	}
-	gsV002 = Version{
-		Tag: "gs-v0.0.2",
-		SupportedVersions: []*Version{
-			&gcV001,
-		},
-	}
-	gsV003 = Version{
-		Tag: "gs-v0.0.3",
-		SupportedVersions: []*Version{
-			&gcV001,
-		},
-	}
-	gsV004 = Version{
-		Tag: "gs-v0.0.4",
 		SupportedVersions: []*Version{
 			&gcV001,
 		},
@@ -50,13 +30,10 @@ var (
 		Tag: "ge-v0.0.1",
 		SupportedVersions: []*Version{
 			&gsV001,
-			&gsV002,
 		},
 	}
 
-	versions = []Version{
-		gcV001, gsV001, gsV002, geV001, gsV003, gsV004, gcV003,
-	}
+	versions = []Version{gcV001, gsV001, geV001}
 )
 
 func Get() []Version {
@@ -74,7 +51,7 @@ func GetVersion(vs []Version, vt string) (*Version, error) {
 					for _, sv := range v.SupportedVersions {
 						if !sv.isValid() {
 							return nil,
-								fmt.Errorf("version provided %q has version %q associated that isn't valid",
+								fmt.Errorf(game.VersionAssociatedNotValidErr,
 									v.Tag, sv.Tag)
 						}
 					}
@@ -83,9 +60,9 @@ func GetVersion(vs []Version, vt string) (*Version, error) {
 			}
 		}
 	} else {
-		return nil, fmt.Errorf("version provided %q is not a valid version", vt)
+		return nil, fmt.Errorf(game.VersionNotValidErr, vt)
 	}
-	return nil, fmt.Errorf("version provided %q not found", vt)
+	return nil, fmt.Errorf(game.VersionNotFoundErr, vt)
 }
 
 func (v Version) isValid() bool {

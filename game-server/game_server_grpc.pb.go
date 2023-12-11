@@ -22,6 +22,10 @@ const (
 	Route_VerifyCompatibility_FullMethodName = "/gameserver.Route/VerifyCompatibility"
 	Route_Login_FullMethodName               = "/gameserver.Route/Login"
 	Route_POL_FullMethodName                 = "/gameserver.Route/POL"
+	Route_CheckMatchCanStart_FullMethodName  = "/gameserver.Route/CheckMatchCanStart"
+	Route_ServeBoard_FullMethodName          = "/gameserver.Route/ServeBoard"
+	Route_Play_FullMethodName                = "/gameserver.Route/Play"
+	Route_CheckBoardUpdated_FullMethodName   = "/gameserver.Route/CheckBoardUpdated"
 )
 
 // RouteClient is the client API for Route service.
@@ -31,6 +35,10 @@ type RouteClient interface {
 	VerifyCompatibility(ctx context.Context, in *VerifyCompatibilityPayload, opts ...grpc.CallOption) (*VerifyCompatibilityResponse, error)
 	Login(ctx context.Context, in *LoginPayload, opts ...grpc.CallOption) (*LoginResponse, error)
 	POL(ctx context.Context, in *POLPayload, opts ...grpc.CallOption) (*POLResponse, error)
+	CheckMatchCanStart(ctx context.Context, in *CheckMatchCanStartPayload, opts ...grpc.CallOption) (*CheckMatchCanStartResponse, error)
+	ServeBoard(ctx context.Context, in *ServeBoardPayload, opts ...grpc.CallOption) (*ServeBoardResponse, error)
+	Play(ctx context.Context, in *PlayPayload, opts ...grpc.CallOption) (*PlayResponse, error)
+	CheckBoardUpdated(ctx context.Context, in *CheckBoardUpdatedPayload, opts ...grpc.CallOption) (*CheckBoardUpdatedResponse, error)
 }
 
 type routeClient struct {
@@ -68,6 +76,42 @@ func (c *routeClient) POL(ctx context.Context, in *POLPayload, opts ...grpc.Call
 	return out, nil
 }
 
+func (c *routeClient) CheckMatchCanStart(ctx context.Context, in *CheckMatchCanStartPayload, opts ...grpc.CallOption) (*CheckMatchCanStartResponse, error) {
+	out := new(CheckMatchCanStartResponse)
+	err := c.cc.Invoke(ctx, Route_CheckMatchCanStart_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeClient) ServeBoard(ctx context.Context, in *ServeBoardPayload, opts ...grpc.CallOption) (*ServeBoardResponse, error) {
+	out := new(ServeBoardResponse)
+	err := c.cc.Invoke(ctx, Route_ServeBoard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeClient) Play(ctx context.Context, in *PlayPayload, opts ...grpc.CallOption) (*PlayResponse, error) {
+	out := new(PlayResponse)
+	err := c.cc.Invoke(ctx, Route_Play_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeClient) CheckBoardUpdated(ctx context.Context, in *CheckBoardUpdatedPayload, opts ...grpc.CallOption) (*CheckBoardUpdatedResponse, error) {
+	out := new(CheckBoardUpdatedResponse)
+	err := c.cc.Invoke(ctx, Route_CheckBoardUpdated_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RouteServer is the server API for Route service.
 // All implementations must embed UnimplementedRouteServer
 // for forward compatibility
@@ -75,6 +119,10 @@ type RouteServer interface {
 	VerifyCompatibility(context.Context, *VerifyCompatibilityPayload) (*VerifyCompatibilityResponse, error)
 	Login(context.Context, *LoginPayload) (*LoginResponse, error)
 	POL(context.Context, *POLPayload) (*POLResponse, error)
+	CheckMatchCanStart(context.Context, *CheckMatchCanStartPayload) (*CheckMatchCanStartResponse, error)
+	ServeBoard(context.Context, *ServeBoardPayload) (*ServeBoardResponse, error)
+	Play(context.Context, *PlayPayload) (*PlayResponse, error)
+	CheckBoardUpdated(context.Context, *CheckBoardUpdatedPayload) (*CheckBoardUpdatedResponse, error)
 	mustEmbedUnimplementedRouteServer()
 }
 
@@ -90,6 +138,18 @@ func (UnimplementedRouteServer) Login(context.Context, *LoginPayload) (*LoginRes
 }
 func (UnimplementedRouteServer) POL(context.Context, *POLPayload) (*POLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method POL not implemented")
+}
+func (UnimplementedRouteServer) CheckMatchCanStart(context.Context, *CheckMatchCanStartPayload) (*CheckMatchCanStartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckMatchCanStart not implemented")
+}
+func (UnimplementedRouteServer) ServeBoard(context.Context, *ServeBoardPayload) (*ServeBoardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ServeBoard not implemented")
+}
+func (UnimplementedRouteServer) Play(context.Context, *PlayPayload) (*PlayResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Play not implemented")
+}
+func (UnimplementedRouteServer) CheckBoardUpdated(context.Context, *CheckBoardUpdatedPayload) (*CheckBoardUpdatedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckBoardUpdated not implemented")
 }
 func (UnimplementedRouteServer) mustEmbedUnimplementedRouteServer() {}
 
@@ -158,6 +218,78 @@ func _Route_POL_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Route_CheckMatchCanStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckMatchCanStartPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).CheckMatchCanStart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_CheckMatchCanStart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).CheckMatchCanStart(ctx, req.(*CheckMatchCanStartPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Route_ServeBoard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ServeBoardPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).ServeBoard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_ServeBoard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).ServeBoard(ctx, req.(*ServeBoardPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Route_Play_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).Play(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_Play_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).Play(ctx, req.(*PlayPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Route_CheckBoardUpdated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckBoardUpdatedPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServer).CheckBoardUpdated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Route_CheckBoardUpdated_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServer).CheckBoardUpdated(ctx, req.(*CheckBoardUpdatedPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Route_ServiceDesc is the grpc.ServiceDesc for Route service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +308,22 @@ var Route_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "POL",
 			Handler:    _Route_POL_Handler,
+		},
+		{
+			MethodName: "CheckMatchCanStart",
+			Handler:    _Route_CheckMatchCanStart_Handler,
+		},
+		{
+			MethodName: "ServeBoard",
+			Handler:    _Route_ServeBoard_Handler,
+		},
+		{
+			MethodName: "Play",
+			Handler:    _Route_Play_Handler,
+		},
+		{
+			MethodName: "CheckBoardUpdated",
+			Handler:    _Route_CheckBoardUpdated_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

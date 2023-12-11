@@ -8,6 +8,8 @@ service Route {
   rpc VerifyCompatibility (VerifyCompatibilityPayload) returns (VerifyCompatibilityResponse) {}
   rpc Connect (ConnectPayload) returns (ConnectResponse) {}
   rpc POL (POLPayload) returns (POLResponse) {}
+  rpc ServeBoard (ServeBoardPayload) returns (ServeBoardResponse) {}
+  rpc Play (PlayPayload) returns (PlayResponse) {}
 }
 
 message VerifyCompatibilityPayload {
@@ -15,21 +17,37 @@ message VerifyCompatibilityPayload {
 }
 
 message VerifyCompatibilityResponse {
-  string gameEngineVersion = 1;
 }
 
 message ConnectPayload {
 }
 
 message ConnectResponse {
-  string token = 1;
-  string err = 2;
+  string sessionToken = 1;
 }
 
 message POLPayload {
   string sessionToken = 1;
+  string encodedBoards = 2;
 }
 
 message POLResponse {
-  string err = 1;
+}
+
+message ServeBoardPayload {
+  string boardID = 1;
+}
+
+message ServeBoardResponse {
+  string board = 1;
+}
+
+message PlayPayload {
+  string boardID = 1;
+  string playerCode = 2;
+  int32 column = 3;
+}
+
+message PlayResponse {
+  bool thereIsWinner = 1;
 }
